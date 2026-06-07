@@ -1,0 +1,5 @@
+[2025-12-04 07:37:07] Request startedSession OK - user_id: 5connect.php found, including...connect.php includedConnection OKJSON data received: Valid arrayProcessing 1 recordsStatement prepared successfullyProcessing record 0: student=10, violation=5Record 0: Student check executed[2025-12-04 07:42:58] Request startedSession OK - user_id: 5connect.php found, including...connect.php includedConnection OKJSON data received: Valid arrayProcessing 2 recordsStatement prepared successfullyProcessing record 0: student=10, violation=5Record 0: Student check executed[2025-12-04 07:48:01] === REQUEST STARTED ===
+[2025-12-04 07:48:01] Error reporting configured
+[2025-12-04 07:48:01] Headers sent
+[2025-12-04 07:48:01] Session started
+[2025-12-04 07:48:01] User ID: 5

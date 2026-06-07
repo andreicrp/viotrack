@@ -1,0 +1,295 @@
+/**
+ * Offline Violation Manager
+ * Handles saving violations when offline and syncing when online
+ */
+
+class OfflineViolationManager {
+    constructor() {
+        this.storageKey = 'pendingViolationRecords';
+        this.isSyncing = false;
+        this.syncInterval = 5000; // 5 seconds
+        this.init();
+    }
+    
+    /**
+     * Initialize offline manager
+     */
+    init() {
+        // Listen for online/offline events
+        window.addEventListener('online', () => this.onOnline());
+        window.addEventListener('offline', () => this.onOffline());
+        
+        // Auto-sync every 5 seconds if online
+        setInterval(() => {
+            if (navigator.onLine && !this.isSyncing) {
+                this.checkAndSync();
+            }
+        }, this.syncInterval);
+        
+        // Check status on page load
+        if (!navigator.onLine) {
+            this.showOfflineBadge();
+        }
+        
+        console.log('✓ Offline Manager initialized');
+    }
+    
+    /**
+     * Save violation offline (in browser's localStorage)
+     * @param {Object} recordData - Violation data to save
+     * @returns {Object} Saved record with unique ID
+     */
+    saveOffline(recordData) {
+        const pending = this.getPending();
+        
+        const record = {
+            id: Date.now(), // Unique ID using timestamp
+            ...recordData,
+            status: recordData.status || 'Pending',
+            offline_recorded_at: new Date().toISOString(),
+            is_synced: false,
+            accuracy: recordData.accuracy || 0
+        };
+        
+        pending.push(record);
+        localStorage.setItem(this.storageKey, JSON.stringify(pending));
+        
+        console.log('✓ Saved offline:', record);
+        return record;
+    }
+    
+    /**
+     * Get all pending violations from localStorage
+     * @returns {Array} Array of pending violations
+     */
+    getPending() {
+        return JSON.parse(localStorage.getItem(this.storageKey) || '[]');
+    }
+    
+    /**
+     * Auto-sync when online
+     * Sends all pending violations to server
+     */
+    async checkAndSync() {
+        const pending = this.getPending();
+        
+        if (pending.length === 0) return;
+        
+        this.isSyncing = true;
+        this.showSyncingBadge(pending.length);
+        
+        try {
+            const response = await fetch('sync-violations.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ records: pending })
+            });
+            
+            const result = await response.json();
+            
+            console.log('Sync response:', result);
+            
+            if (result.success) {
+                console.log('Synced record IDs:', result.synced);
+                console.log('Pending before clear:', pending);
+                
+                // IMPORTANT: Clear ALL pending records after successful sync
+                // Don't rely on filtering - just clear everything
+                localStorage.removeItem(this.storageKey);
+                
+                // Show success notification
+                this.showNotification(
+                    `✓ Synced ${result.synced.length} violation(s) successfully!`,
+                    'success'
+                );
+                
+                console.log(`✓ Successfully synced and cleared localStorage. Total synced: ${result.synced.length}`);
+                
+                // Reload page to refresh the list
+                this.removeBadge();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                console.error('Sync failed - server returned success=false:', result);
+                this.showNotification('❌ Sync failed. Will retry...', 'error');
+            }
+        } catch (error) {
+            console.error('Sync fetch error:', error);
+            console.error('Error type:', error.name);
+            console.error('Error message:', error.message);
+            this.showNotification('❌ Sync failed. Will retry...', 'error');
+        } finally {
+            this.isSyncing = false;
+        }
+    }
+    
+    /**
+     * Called when internet is restored
+     */
+    onOnline() {
+        console.log('📡 Internet restored');
+        this.showNotification('📡 Internet restored - Syncing now...', 'success');
+        setTimeout(() => this.checkAndSync(), 500);
+    }
+    
+    /**
+     * Called when internet is lost
+     */
+    onOffline() {
+        console.log('📴 Internet lost');
+        this.showOfflineBadge();
+        this.showNotification('📴 Internet lost - Working in offline mode', 'warning');
+    }
+    
+    /**
+     * Check sync status from server
+     */
+    updateStatus() {
+        fetch('check-sync-status.php')
+            .then(r => r.json())
+            .then(data => {
+                if (data.pending_count > 0) {
+                    this.showPendingBadge(data.pending_count);
+                }
+            })
+            .catch(e => console.log('Status check failed:', e));
+    }
+    
+    /**
+     * Show offline badge UI
+     */
+    showOfflineBadge() {
+        this.removeBadge();
+        
+        const badge = document.createElement('div');
+        badge.id = 'offlineBadge';
+        badge.innerHTML = '⚠️ OFFLINE MODE - Changes will sync when online';
+        badge.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 6px;
+            z-index: 9999;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(badge);
+    }
+    
+    /**
+     * Show syncing badge UI
+     */
+    showSyncingBadge(count) {
+        this.removeBadge();
+        
+        const badge = document.createElement('div');
+        badge.id = 'offlineBadge';
+        badge.innerHTML = `
+            <span style="display:inline-block; width:12px; height:12px; border:2px solid white; border-top:2px solid transparent; border-radius:50%; animation:spin 1s linear infinite; margin-right:8px;"></span>
+            ⏳ ${count} pending violation(s) - Syncing...
+        `;
+        badge.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 6px;
+            z-index: 9999;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(badge);
+    }
+    
+    /**
+     * Show notification toast
+     */
+    showNotification(message, type = 'info') {
+        const notif = document.createElement('div');
+        notif.innerHTML = message;
+        
+        const colors = {
+            success: '#4caf50',
+            error: '#f44336',
+            warning: '#ff9800',
+            info: '#2196f3'
+        };
+        
+        notif.style.cssText = `
+            position: fixed;
+            top: 130px;
+            right: 20px;
+            background: ${colors[type]};
+            color: white;
+            padding: 14px 20px;
+            border-radius: 6px;
+            z-index: 9998;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(notif);
+        
+        setTimeout(() => notif.remove(), 3000);
+    }
+    
+    /**
+     * Remove badge
+     */
+    removeBadge() {
+        const badge = document.getElementById('offlineBadge');
+        if (badge) badge.remove();
+    }
+    
+    /**
+     * Clear all pending violations (admin function)
+     */
+    clearPending() {
+        localStorage.removeItem(this.storageKey);
+        this.removeBadge();
+        console.log('✓ Cleared all pending violations');
+    }
+    
+    /**
+     * Get count of pending violations
+     */
+    getPendingCount() {
+        return this.getPending().length;
+    }
+}
+
+// Add CSS animations
+(function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
+// Initialize on page load
+const offlineManager = new OfflineViolationManager();
