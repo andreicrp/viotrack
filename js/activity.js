@@ -67,7 +67,7 @@ function deleteMultipleActivities(ids, checkboxes, callback) {
     const formData = new FormData();
     formData.append('activity_ids', JSON.stringify(ids));
     
-    fetch('delete_activity.php', {
+    fetch('php/delete_activity.php', {
         method: 'POST',
         body: formData
     })
@@ -260,7 +260,7 @@ function deleteActivity() {
         const formData = new FormData();
         formData.append('activity_id', parseInt(currentActivityId));
         
-        fetch('delete_activity.php', {
+        fetch('php/delete_activity.php', {
             method: 'POST',
             body: formData
         })

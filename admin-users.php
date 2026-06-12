@@ -172,10 +172,10 @@ $totalAdminUsers = count($adminUsers);
 </main>
 
 <!-- Include Edit Admin Modal -->
-<?php include 'editadmin-modal.php'; ?>
+<?php include 'php/modals/editadmin-modal.php'; ?>
 
 <!-- Include Add Admin Modal -->
-<?php include 'addadmin-modal.php'; ?>
+<?php include 'php/modals/addadmin-modal.php'; ?>
 
 <script>
 // Define edit and remove functions BEFORE DOMContentLoaded
@@ -241,7 +241,7 @@ function removeAdminUser(id) {
 
     if (confirm('Are you sure you want to remove this admin user? This action cannot be undone.')) {
         // Send AJAX request to delete admin user
-        fetch('delete_admin.php', {
+        fetch('php/delete_admin.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteSelectedBtn.textContent = 'Deleting...';
             
             // Send AJAX request to delete admin users
-            fetch('delete-admin-users.php', {
+            fetch('php/delete-admin-users.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -660,7 +660,7 @@ function processImport() {
             }
             
             // Send to server for import
-            fetch('import-admin-users.php', {
+            fetch('php/import-admin-users.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

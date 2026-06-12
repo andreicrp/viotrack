@@ -523,92 +523,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-image-side">
             <div class="image-wrapper">
                 <img src="images/phcm-logo.png" alt="School Logo" class="school-logo">
+    <div class="login-brand-panel">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="brand-content">
+            <div class="brand-logo">
+                <img src="images/phcm-logo.png" alt="PHCM Logo">
+                <div class="brand-logo-text">VIOTRACK<span>Perpetual Help College</span></div>
             </div>
-        </div>
-
-        <!-- Form -->
-        <div class="login-form-side">
-            <div class="login-box">
-                <h1>VIOTRACK</h1>
-                <p class="subtitle">Sign in to continue.</p>
-                
-                <?php if ($error): ?>
-                    <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-                <?php endif; ?>
-                
-                <?php if ($success): ?>
-                    <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
-                <?php endif; ?>
-                
-                <form method="POST" action="">
-                    <!-- CSRF Token -->
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
-                    
-                    <?php if ($return): ?>
-                        <input type="hidden" name="return" value="<?php echo $return; ?>">
-                    <?php endif; ?>
-                    <?php if ($qrToken): ?>
-                        <input type="hidden" name="qr_token" value="<?php echo $qrToken; ?>">
-                        <input type="hidden" name="qr_id" value="<?php echo $qrId; ?>">
-                    <?php endif; ?>
-                    
-                    <div class="form-group">
-                        <label>Sign In As:</label>
-                        <div class="user-type-selector">
-                            <div class="user-type-option">
-                                <input type="radio" id="admin" name="user_type" value="admin" checked>
-                                <label for="admin" class="user-type-label">Admin</label>
-                            </div>
-                            <div class="user-type-option">
-                                <input type="radio" id="teacher" name="user_type" value="teacher">
-                                <label for="teacher" class="user-type-label">Teacher</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" class="form-input" placeholder="Email Address" value="<?php echo $savedEmail; ?>" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="password-input-wrapper">
-                            <input type="password" id="password" name="password" class="form-input" placeholder="Password" value="<?php echo $savedPassword; ?>" required>
-                            <button type="button" class="toggle-password" id="togglePassword" title="Show/Hide Password">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="form-options">
-                        <label class="checkbox-container">
-                            <input type="checkbox" name="remember" <?php echo $isRemembered ? 'checked' : ''; ?>>
-                            <span>Keep me signed in</span>
-                        </label>
-                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd7SN8jra5WfROhysYtjd80zMUSwSnxpcQ-a3d1bu8CiogDng/viewform" class="forgot-link" target="_blank">Forgot password?</a>
-                    </div>
-                    
-                    <button type="submit" class="btn-signin">SIGN IN</button>
-                </form>
+            <h1 class="brand-heading">Student<br><span class="grad">Violation</span><br>Tracker</h1>
+            <p class="brand-sub">A smart, offline-capable system for tracking, managing, and resolving student violations with ease.</p>
+            <div class="brand-features">
+                <div class="brand-feature"><div class="brand-feature-icon"><i class="fas fa-wifi-slash"></i></div>Offline-first — works without internet</div>
+                <div class="brand-feature"><div class="brand-feature-icon"><i class="fas fa-qrcode"></i></div>QR Code student identification</div>
+                <div class="brand-feature"><div class="brand-feature-icon"><i class="fas fa-chart-bar"></i></div>Real-time analytics dashboard</div>
+                <div class="brand-feature"><div class="brand-feature-icon"><i class="fas fa-shield-halved"></i></div>Role-based access control</div>
             </div>
         </div>
     </div>
 
-    <script>
-        const toggleButton = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
+    <div class="login-form-panel">
+        <div class="login-box">
+            <h1 class="login-title">Welcome back</h1>
+            <p class="login-subtitle">Sign in to your VioTrack account to continue.</p>
 
-        if (toggleButton) {
-            toggleButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                
-                // Toggle icon
-                if (type === 'text') {
-                    this.innerHTML = '<i class="fas fa-eye-slash"></i>';
-                } else {
+            <?php if ($error): ?>
+                <div class="alert alert-error"><i class="fas fa-circle-exclamation"></i><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+            <?php if ($success): ?>
+                <div class="alert alert-success"><i class="fas fa-circle-check"></i><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+
+            <form method="POST" action="" id="loginForm">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+                <?php if ($return): ?><input type="hidden" name="return" value="<?php echo $return; ?>"><?php endif; ?>
+                <?php if ($qrToken): ?>
+                    <input type="hidden" name="qr_token" value="<?php echo $qrToken; ?>">
+                    <input type="hidden" name="qr_id" value="<?php echo $qrId; ?>">
+                <?php endif; ?>
+
+                <div class="role-tabs">
+                    <input type="radio" id="admin" name="user_type" value="admin" class="role-tab" checked>
+                    <label for="admin" class="role-tab-label"><i class="fas fa-crown"></i> Admin</label>
+                    <input type="radio" id="teacher" name="user_type" value="teacher" class="role-tab">
+                    <label for="teacher" class="role-tab-label"><i class="fas fa-chalkboard-teacher"></i> Teacher</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" name="email" class="form-input" placeholder="you@school.edu.ph" value="<?php echo $savedEmail; ?>" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" value="<?php echo $savedPassword; ?>" required>
+                        <i class="fas fa-lock input-icon"></i>
+                        <button type="button" class="toggle-password" id="togglePassword"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember" <?php echo $isRemembered ? 'checked' : ''; ?>>
+                        <span>Keep me signed in</span>
+                    </label>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSd7SN8jra5WfROhysYtjd80zMUSwSnxpcQ-a3d1bu8CiogDng/viewform" class="forgot-link" target="_blank" rel="noopener">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-signin" id="signInBtn">
+                    <span class="btn-text"><i class="fas fa-arrow-right-to-bracket" style="margin-right:8px;"></i>Sign In</span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+
+            <p class="login-footer-note">
+                Having trouble? Contact your <strong>system administrator</strong>.<br>
+                &copy; <?php echo date('Y'); ?> Perpetual Help College of Manila
+            </p>
+        </div>
+    </div>
+
+    <script>
                     this.innerHTML = '<i class="fas fa-eye"></i>';
                 }
             });

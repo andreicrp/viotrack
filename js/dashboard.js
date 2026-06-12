@@ -568,7 +568,7 @@ function updatePercentageDate() {
 function initializeCalendar() {
     console.log('Initializing calendar...');
     // Load meetings from database
-    fetch('get-meetings.php')
+    fetch('php/get-meetings.php')
         .then(response => {
             console.log('Response status:', response.status);
             return response.json();
@@ -932,7 +932,7 @@ function updateMeetingStatus(id, newStatus) {
         return;
     }
     
-    fetch('update-meeting-status.php', {
+    fetch('php/update-meeting-status.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1012,7 +1012,7 @@ function deleteMeetingFromModal(id) {
     
     const numId = parseInt(id);
     
-    fetch('delete-meeting.php', {
+    fetch('php/delete-meeting.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1095,7 +1095,7 @@ function addOrUpdateMeeting() {
     }
     
     // Save to database
-    fetch('save-meeting.php', {
+    fetch('php/save-meeting.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1176,7 +1176,7 @@ function deleteMeeting(id) {
     if (!confirm('Are you sure you want to delete this meeting?')) return;
     
     // Delete from database
-    fetch('delete-meeting.php', {
+    fetch('php/delete-meeting.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

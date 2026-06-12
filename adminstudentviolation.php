@@ -735,7 +735,7 @@
             formData.append('action', 'bulk_delete');
             formData.append('record_ids', JSON.stringify(ids));
             
-            fetch('update-status-handler.php', {
+            fetch('php/update-status-handler.php', {
                 method: 'POST',
                 body: formData
             })
@@ -768,7 +768,7 @@
             formData.append('action', 'bulk_delete');
             formData.append('record_ids', JSON.stringify([id]));
             
-            fetch('update-status-handler.php', {
+            fetch('php/update-status-handler.php', {
                 method: 'POST',
                 body: formData
             })
@@ -1048,7 +1048,7 @@
         
         console.log('Payload being sent:', payload);
         
-        fetch('add_violation_record.php', {
+        fetch('php/add_violation_record.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1152,7 +1152,7 @@
     // ============ RESOLUTION LETTER FUNCTIONS ============
     function viewResolutionLetter(recordId) {
         // First fetch the clicked violation to get student ID
-        fetch('get-student-violations.php?id=' + recordId)
+        fetch('php/get-student-violations.php?id=' + recordId)
         .then(response => response.json())
         .then(data => {
             if (data.success && data.violation) {
@@ -1160,7 +1160,7 @@
                 const studentId = data.violation.student_db_id;
                 
                 // Now fetch ALL resolved violations for this student
-                return fetch('get-student-violations.php?student_id=' + studentId + '&status=Resolved')
+                return fetch('php/get-student-violations.php?student_id=' + studentId + '&status=Resolved')
                     .then(response => response.json())
                     .then(allData => {
                         if (allData.success) {
@@ -1551,7 +1551,7 @@
     </div>
 
     <!-- Include Resolution Letter Modal -->
-    <?php include 'resolution-modal.php'; ?>
+    <?php include 'php/modals/resolution-modal.php'; ?>
 
     <!-- SMS Modal -->
     <div class="sms-modal-overlay" id="smsModal">

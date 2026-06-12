@@ -1,6 +1,6 @@
 <?php
 // Database connection
-require_once("connect.php");
+require_once("../connect.php");
 
 try {
     $studentsQuery = $conn->query("

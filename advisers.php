@@ -357,7 +357,7 @@ function addViolation(studentId, studentName) {
 function removeAdviser(id, name) {
     if (confirm(`Are you sure you want to remove ${name} as an adviser?`)) {
         // Send request to backend to remove adviser
-        fetch('delete-adviser.php', {
+        fetch('php/delete-adviser.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

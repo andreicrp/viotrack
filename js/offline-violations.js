@@ -79,7 +79,7 @@ class OfflineViolationManager {
         this.showSyncingBadge(pending.length);
         
         try {
-            const response = await fetch('sync-violations.php', {
+            const response = await fetch('php/sync-violations.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ records: pending })
@@ -144,7 +144,7 @@ class OfflineViolationManager {
      * Check sync status from server
      */
     updateStatus() {
-        fetch('check-sync-status.php')
+        fetch('php/check-sync-status.php')
             .then(r => r.json())
             .then(data => {
                 if (data.pending_count > 0) {

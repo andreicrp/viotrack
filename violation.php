@@ -200,8 +200,8 @@ $totalPages = ceil($totalViolations / $violationsPerPage);
     </div>
 </main>
 <!-- Include Modals -->
-<?php include 'violation-modal.php'; ?>
-<?php include 'importviolation-modal.php'; ?>
+<?php include 'php/modals/violation-modal.php'; ?>
+<?php include 'php/modals/importviolation-modal.php'; ?>
 
 <!-- Violation Details Modal -->
 <div class="violation-details-modal-overlay" id="violationDetailsModal">
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // Send delete request to server
-            fetch('delete_violation.php', {
+            fetch('php/delete_violation.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -409,7 +409,7 @@ function updateShowingText() {
 // Export Violations - All violations
 function exportViolations() {
     // Fetch all violations from database
-    fetch('export-violations.php')
+    fetch('php/export-violations.php')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');

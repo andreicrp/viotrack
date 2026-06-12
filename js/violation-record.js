@@ -260,7 +260,7 @@ function resolveSelected() {
     
     const recordIds = Array.from(checkedBoxes).map(cb => cb.value);
     
-    fetch('update-status-handler.php', {
+    fetch('php/update-status-handler.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -296,7 +296,7 @@ function deleteSelected() {
     
     const recordIds = Array.from(checkedBoxes).map(cb => cb.value);
     
-    fetch('delete-record-handler.php', {
+    fetch('php/delete-record-handler.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -324,7 +324,7 @@ function deleteViolation(id) {
         return;
     }
     
-    fetch('delete-record-handler.php', {
+    fetch('php/delete-record-handler.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

@@ -579,8 +579,8 @@ function filterStudents() {
 
 <?php
 // Include the bulk violations modal
-if (file_exists('addbulkviolations-modal.php')) {
-    include 'addbulkviolations-modal.php';
+if (file_exists('php/modals/addbulkviolations-modal.php')) {
+    include 'php/modals/addbulkviolations-modal.php';
 }
 
 $conn->close();

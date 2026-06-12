@@ -178,10 +178,10 @@ $totalTeachers = count($teachers);
 </main>
 
 <!-- Include Edit Teacher Modal -->
-<?php include 'editteacher-modal.php'; ?>
+<?php include 'php/modals/editteacher-modal.php'; ?>
 
 <!-- Include Add Teacher Modal -->
-<?php include 'addteacher-modal.php'; ?>
+<?php include 'php/modals/addteacher-modal.php'; ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteSelectedBtn.textContent = 'Deleting...';
             
             // Send AJAX request to delete teachers
-            fetch('delete_teachers.php', {
+            fetch('php/delete_teachers.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -325,7 +325,7 @@ function removeTeacher(id) {
 
     if (confirm('Are you sure you want to remove this teacher? This action cannot be undone.')) {
         // Send AJAX request to delete teacher
-        fetch('delete_teacher.php', {
+        fetch('php/delete_teacher.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -360,7 +360,7 @@ function appointAsAdviser(id, name) {
     }
 
     // Fetch available grade/section combinations from database
-    fetch('get-grade-sections.php')
+    fetch('php/get-grade-sections.php')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -466,7 +466,7 @@ function confirmAppointment(id, name) {
     btn.textContent = 'Appointing...';
 
     // Send appointment data to backend
-    fetch('appoint-adviser.php', {
+    fetch('php/appoint-adviser.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -790,7 +790,7 @@ function processImport() {
             }
             
             // Send to server for import
-            fetch('import-teachers.php', {
+            fetch('php/import-teachers.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

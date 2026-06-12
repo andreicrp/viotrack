@@ -276,14 +276,14 @@ $totalViolations = count($violations);
 </div>
 
 <!-- Include Status Change Modal -->
-<?php include 'status-modal.php'; ?>
+<?php include 'php/modals/status-modal.php'; ?>
 
 <!-- Include Add Record Modal (if exists) -->
 <?php 
-if (file_exists('addrecord-modal-multi.php')) {
-    include 'addrecord-modal-multi.php'; 
-} else if (file_exists('addrecord-modal.php')) {
-    include 'addrecord-modal.php'; 
+if (file_exists('php/modals/addrecord-modal-multi.php')) {
+    include 'php/modals/addrecord-modal-multi.php'; 
+} else if (file_exists('php/modals/addrecord-modal.php')) {
+    include 'php/modals/addrecord-modal.php'; 
 }
 ?>
 
@@ -571,7 +571,7 @@ function resolveSelected() {
         
         console.log('Sending to backend with action=bulk_resolve');
         
-        fetch('update-status-handler.php', {
+        fetch('php/update-status-handler.php', {
             method: 'POST',
             body: formData
         })
@@ -633,7 +633,7 @@ function deleteSelected() {
         formData.append('action', 'bulk_delete');
         formData.append('record_ids', JSON.stringify(recordIds));
         
-        fetch('update-status-handler.php', {
+        fetch('php/update-status-handler.php', {
             method: 'POST',
             body: formData
         })
@@ -667,7 +667,7 @@ function deleteViolation(id) {
         formData.append('action', 'bulk_delete');
         formData.append('record_ids', JSON.stringify([parseInt(id)]));
         
-        fetch('update-status-handler.php', {
+        fetch('php/update-status-handler.php', {
             method: 'POST',
             body: formData
         })
@@ -692,7 +692,7 @@ function deleteViolation(id) {
 // View Resolution Letter
 function viewResolutionLetter(recordId) {
     // First fetch the clicked violation to get student ID
-    fetch('get-student-violations.php?id=' + recordId)
+    fetch('php/get-student-violations.php?id=' + recordId)
     .then(response => response.json())
     .then(data => {
         if (data.success && data.violation) {
@@ -700,7 +700,7 @@ function viewResolutionLetter(recordId) {
             const studentId = data.violation.student_db_id;
             
             // Now fetch ALL resolved violations for this student
-            return fetch('get-student-violations.php?student_id=' + studentId + '&status=Resolved')
+            return fetch('php/get-student-violations.php?student_id=' + studentId + '&status=Resolved')
                 .then(response => response.json())
                 .then(allData => {
                     if (allData.success) {

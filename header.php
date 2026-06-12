@@ -100,7 +100,17 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIOTRACK - Student Violation Tracker</title>
+    <meta name="description" content="VioTrack - Student Violation Tracker for Perpetual Help College of Manila">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Design System -->
+    <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
@@ -110,38 +120,13 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
     <link rel="stylesheet" href="css/profile.css">
     <link rel="stylesheet" href="css/activity.css">
     <link rel="stylesheet" href="css/addrecord-modal.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            position: relative;
-            min-height: 100vh;
-        }
-        
-        .main-header {
-            z-index: 1000;
-        }
-        
-        .sidebar {
-            z-index: 999;
-        }
-        
-        .sidebar-overlay {
-            z-index: 998;
-        }
-        
-        .main-content {
-            z-index: 1;
-        }
+        /* Inline critical overrides */
+        .main-content { z-index: 1; }
     </style>
 </head>
 <body>
-    <header class="main-header">
+    <header class="main-header" id="mainHeader">
         <div class="header-left">
             <button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle menu">
                 <i class="fas fa-bars"></i>
@@ -151,43 +136,71 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
                 <div class="logo-icon">
                     <img src="images/phcm-logo.png" alt="VioTrack Logo">
                 </div>
-                <span class="logo-text">VIOTRACK: By Perpetual Help College of Manila</span>
+                <div class="logo-text">
+                    VIOTRACK
+                    <span>Perpetual Help College of Manila</span>
+                </div>
             </a>
             <!-- Mobile: Just the text -->
             <a href="dashboard.php" class="logo-text-mobile">VIOTRACK</a>
         </div>
         
         <div class="header-right">
-            <div class="user-dropdown" id="userDropdown">
-                    <button class="user-avatar" id="userAvatarBtn">
-                        <img src="<?php echo htmlspecialchars($avatar_url_40); ?>" alt="<?php echo htmlspecialchars($user_name); ?>" onerror="this.src='<?php echo htmlspecialchars($user_avatar . '40'); ?>'">
-                    </button>
-                    <div class="dropdown-menu" id="dropdownMenu">
-                        <div class="dropdown-header">
-                            <img src="<?php echo htmlspecialchars($avatar_url_48); ?>" alt="<?php echo htmlspecialchars($user_name); ?>" onerror="this.src='<?php echo htmlspecialchars($user_avatar . '48'); ?>'">
-                            <div class="dropdown-user-info">
-                                <span class="dropdown-user-name"><?php echo htmlspecialchars($user_name); ?></span>
-                                <span class="dropdown-user-email"><?php echo htmlspecialchars($user_email); ?></span>
-                            </div>
+            <!-- Notification Bell -->
+            <div class="notification-container" id="notificationContainer">
+                <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notifBadge" style="display:none;">0</span>
+                </button>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">
+                        <h4><i class="fas fa-bell" style="margin-right:8px;color:#6366f1;"></i>Notifications</h4>
+                        <button class="close-btn" onclick="document.getElementById('notificationDropdown').classList.remove('show')">&times;</button>
+                    </div>
+                    <div class="notification-list" id="notificationList">
+                        <div class="notification-empty">
+                            <i class="fas fa-bell-slash"></i>
+                            All caught up!
                         </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="profile.php" class="dropdown-item">
-                            <i class="fas fa-user"></i>
-                            <span>My Profile</span>
-                        </a>
-                        <?php if ($isAdmin): ?>
-                        <a href="activity.php" class="dropdown-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>Activity</span>
-                        </a>
-                        <?php endif; ?>
-                        <div class="dropdown-divider"></div>
-                        <a href="logout.php" class="dropdown-item">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Sign Out</span>
-                        </a>
                     </div>
                 </div>
+            </div>
+
+            <!-- User Menu -->
+            <div class="user-dropdown" id="userDropdown">
+                <button class="user-avatar" id="userAvatarBtn" title="<?php echo htmlspecialchars($user_name); ?>">
+                    <img src="<?php echo htmlspecialchars($avatar_url_40); ?>" alt="<?php echo htmlspecialchars($user_name); ?>" onerror="this.src='<?php echo htmlspecialchars($user_avatar . '40'); ?>'">
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-header">
+                        <img src="<?php echo htmlspecialchars($avatar_url_48); ?>" alt="<?php echo htmlspecialchars($user_name); ?>" onerror="this.src='<?php echo htmlspecialchars($user_avatar . '48'); ?>'">
+                        <div class="dropdown-user-info">
+                            <span class="dropdown-user-name"><?php echo htmlspecialchars($user_name); ?></span>
+                            <span class="dropdown-user-email"><?php echo htmlspecialchars($user_email); ?></span>
+                            <span class="dropdown-role-badge">
+                                <i class="fas fa-<?php echo $isAdmin ? 'crown' : 'chalkboard-teacher'; ?>"></i>
+                                <?php echo ucfirst($user_type ?? 'Admin'); ?>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="profile.php" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <?php if ($isAdmin): ?>
+                    <a href="activity.php" class="dropdown-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Activity Log</span>
+                    </a>
+                    <?php endif; ?>
+                    <div class="dropdown-divider"></div>
+                    <a href="logout.php" class="dropdown-item logout-item">
+                        <i class="fas fa-arrow-right-from-bracket"></i>
+                        <span>Sign Out</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -196,18 +209,69 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
     <script src="js/offline-violations.js"></script>
 
     <script>
-        // User dropdown toggle
+        // ── Header scroll effect ──
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 10);
+        }, { passive: true });
+
+        // ── User dropdown ──
         document.getElementById('userAvatarBtn').addEventListener('click', function(e) {
             e.stopPropagation();
-            document.getElementById('dropdownMenu').classList.toggle('show');
+            const menu = document.getElementById('dropdownMenu');
+            const notif = document.getElementById('notificationDropdown');
+            notif.classList.remove('show');
+            menu.classList.toggle('show');
         });
 
-        // Close dropdown when clicking outside
+        // ── Notification dropdown ──
+        const notifBtn = document.getElementById('notificationBtn');
+        if (notifBtn) {
+            notifBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const drop = document.getElementById('notificationDropdown');
+                const menu = document.getElementById('dropdownMenu');
+                menu.classList.remove('show');
+                drop.classList.toggle('show');
+            });
+        }
+
+        // ── Close dropdowns on outside click ──
         document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('dropdownMenu');
+            const menu = document.getElementById('dropdownMenu');
+            const notifDrop = document.getElementById('notificationDropdown');
             const userBtn = document.getElementById('userAvatarBtn');
-            if (!userBtn.contains(e.target)) {
-                dropdown.classList.remove('show');
+            const notifBtn = document.getElementById('notificationBtn');
+
+            if (menu && !userBtn?.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+            if (notifDrop && !notifBtn?.contains(e.target) && !notifDrop.contains(e.target)) {
+                notifDrop.classList.remove('show');
             }
         });
+
+        // ── Load notifications ──
+        (function loadNotifications() {
+            fetch('php/get-notifications.php')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data || !data.notifications) return;
+                    const list = document.getElementById('notificationList');
+                    const badge = document.getElementById('notifBadge');
+                    if (data.notifications.length === 0) return;
+                    badge.textContent = data.notifications.length;
+                    badge.style.display = 'flex';
+                    list.innerHTML = data.notifications.map(n => `
+                        <div class="notification-item">
+                            <div class="notification-icon violation"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="notification-content">
+                                <div class="notification-title">${n.title || 'Violation Alert'}</div>
+                                <div class="notification-desc">${n.message || ''}</div>
+                                <div class="notification-time">${n.time || ''}</div>
+                            </div>
+                        </div>`).join('');
+                })
+                .catch(() => {});
+        })();
     </script>

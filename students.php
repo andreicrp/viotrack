@@ -260,19 +260,19 @@ if ($students_result->num_rows > 0) {
 </main>
 
 <!-- Include Filter Modal -->
-<?php include 'filter-modal.php'; ?>
+<?php include 'php/modals/filter-modal.php'; ?>
 
 <!-- Include Student View Modal -->
-<?php include 'viewstudent-modal.php'; ?>
+<?php include 'php/modals/viewstudent-modal.php'; ?>
 
 <!-- Include Edit Student Modal -->
-<?php include 'editstudent-modal.php'; ?>
+<?php include 'php/modals/editstudent-modal.php'; ?>
 
 <!-- Include Import Student Modal -->
-<?php include 'studentimport-modal.php'; ?>
+<?php include 'php/modals/studentimport-modal.php'; ?>
 
 <!-- Include Add Student Modal -->
-<?php include 'addstudent-modal.php'; ?>
+<?php include 'php/modals/addstudent-modal.php'; ?>
 
 <script>
 // Export Students Function - Exports ALL students
@@ -410,7 +410,7 @@ function removeStudent(button) {
         const dbId = row.dataset.dbId;
         
         // Send AJAX request to delete student
-        fetch('delete-student.php', {
+        fetch('php/delete-student.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (confirm(`Are you sure you want to delete ${count} selected student(s)?`)) {
             // Send AJAX request to delete multiple students
-            fetch('delete-student.php', {
+            fetch('php/delete-student.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

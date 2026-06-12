@@ -85,7 +85,7 @@ if ($result->num_rows > 0) {
         </div>
 
         <!-- Profile Form -->
-        <form class="profile-form" id="profileForm" method="POST" enctype="multipart/form-data" action="update_teacher.php">
+        <form class="profile-form" id="profileForm" method="POST" enctype="multipart/form-data" action="php/update_teacher.php">
             
             <div class="form-grid">
                 <!-- Left Column -->
