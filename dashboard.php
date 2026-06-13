@@ -592,12 +592,70 @@
         </div>
         <?php endif; ?>
 
+        <!-- ===== VIOLATION HOTSPOT MAP (Admin Only) ===== -->
+        <?php if ($isAdmin): ?>
+        <div class="card map-card" style="margin-top: 30px;">
+            <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin:0;">Violation Hotspot Map</h3>
+                        <p style="margin:0;font-size:12px;color:var(--text-muted);">Live campus violation locations</p>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <span id="mapViolationCount" class="badge" style="background:rgba(99,102,241,0.1);color:#6366f1;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;">Loading...</span>
+                    <button onclick="refreshViolationMap()" style="background:none;border:1px solid var(--surface-border,#e2e8f0);color:var(--text-secondary);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;transition:all 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.08)'" onmouseout="this.style.background='none'">
+                        <i class="fas fa-sync-alt" id="mapRefreshIcon"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Skeleton Loader for Map -->
+            <div id="mapSkeleton" style="padding:20px;">
+                <div class="skeleton" style="height:420px;border-radius:12px;"></div>
+                <div style="display:flex;gap:12px;margin-top:14px;">
+                    <div class="skeleton" style="height:32px;width:120px;border-radius:8px;"></div>
+                    <div class="skeleton" style="height:32px;width:120px;border-radius:8px;"></div>
+                    <div class="skeleton" style="height:32px;width:120px;border-radius:8px;"></div>
+                </div>
+            </div>
+
+            <!-- Map Container (hidden until loaded) -->
+            <div id="mapContainer" style="display:none;padding:20px 20px 10px;">
+                <div id="violationMap" style="height:420px;border-radius:12px;overflow:hidden;border:1px solid var(--surface-border,#e2e8f0);"></div>
+
+                <!-- Map Legend -->
+                <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;padding:12px 16px;background:var(--surface-raised,#f8fafc);border-radius:10px;border:1px solid var(--surface-border,#e2e8f0);">
+                    <span style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-right:4px;">Legend:</span>
+                    <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);">
+                        <span style="width:12px;height:12px;background:#ef4444;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px #ef4444;"></span> Major
+                    </span>
+                    <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);">
+                        <span style="width:12px;height:12px;background:#f59e0b;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px #f59e0b;"></span> Serious
+                    </span>
+                    <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);">
+                        <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px #22c55e;"></span> Minor
+                    </span>
+                    <span id="mapNoDataMsg" style="display:none;font-size:12px;color:var(--text-muted);font-style:italic;">No location data recorded yet. Violations with GPS enabled will appear here.</span>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
     </main>
+
+    <!-- Leaflet.js for Hotspot Map -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
     <!-- Load Chart.js and Export Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 
     <!-- Pass PHP data to JavaScript -->
     <script>
@@ -1422,7 +1480,184 @@
         }
     </script>
 
+    <!-- Skeleton Screen + Map CSS -->
+    <style>
+        /* ── Skeleton Loader ── */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface-raised,#f1f5f9) 25%, var(--surface-border,#e2e8f0) 50%, var(--surface-raised,#f1f5f9) 75%);
+            background-size: 200% auto;
+            animation: skeleton-shimmer 1.5s linear infinite;
+            border-radius: 8px;
+        }
+        @keyframes skeleton-shimmer {
+            from { background-position: 200% center; }
+            to   { background-position: -200% center; }
+        }
+        [data-theme="dark"] .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #253247 50%, #1e293b 75%);
+            background-size: 200% auto;
+            animation: skeleton-shimmer 1.5s linear infinite;
+        }
+
+        /* Stat card skeleton */
+        .stat-card-skeleton {
+            background: var(--surface, #fff);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--surface-border, #e2e8f0);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ── Map Card Tweaks ── */
+        .map-card { overflow: hidden; }
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+        .leaflet-popup-content { margin: 12px 16px !important; font-size: 13px; line-height: 1.6; }
+        .map-popup-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .map-popup-type.Major   { background: #ffe4e6; color: #ef4444; }
+        .map-popup-type.Serious { background: #fef3c7; color: #f59e0b; }
+        .map-popup-type.Minor   { background: #dcfce7; color: #22c55e; }
+    </style>
+
+    <!-- Violation Hotspot Map Script -->
+    <script>
+    let violationMapInstance = null;
+    let mapMarkersLayer = null;
+
+    function initViolationMap() {
+        if (!document.getElementById('violationMap')) return;
+
+        // Show skeleton
+        document.getElementById('mapSkeleton').style.display = 'block';
+        document.getElementById('mapContainer').style.display = 'none';
+
+        fetch('php/get_location.php')
+            .then(r => r.json())
+            .then(data => {
+                // Hide skeleton, show map
+                document.getElementById('mapSkeleton').style.display = 'none';
+                document.getElementById('mapContainer').style.display = 'block';
+
+                const count = data.locations ? data.locations.length : 0;
+                document.getElementById('mapViolationCount').textContent = count + ' location' + (count !== 1 ? 's' : '');
+
+                // Initialize map centered on PHCM campus (Manila)
+                if (!violationMapInstance) {
+                    violationMapInstance = L.map('violationMap', {
+                        center: [14.6124466, 120.9879835],
+                        zoom: 15,
+                        zoomControl: true,
+                        scrollWheelZoom: true
+                    });
+
+                    // Premium tile layer
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+                        subdomains: 'abcd',
+                        maxZoom: 20
+                    }).addTo(violationMapInstance);
+
+                    mapMarkersLayer = L.layerGroup().addTo(violationMapInstance);
+                } else {
+                    mapMarkersLayer.clearLayers();
+                }
+
+                if (!data.locations || data.locations.length === 0) {
+                    document.getElementById('mapNoDataMsg').style.display = 'inline';
+                    return;
+                }
+
+                document.getElementById('mapNoDataMsg').style.display = 'none';
+
+                const colorMap = {
+                    'Major':   { fill: '#ef4444', stroke: '#b91c1c' },
+                    'Serious': { fill: '#f59e0b', stroke: '#b45309' },
+                    'Minor':   { fill: '#22c55e', stroke: '#15803d' }
+                };
+
+                const bounds = [];
+                data.locations.forEach(loc => {
+                    const c = colorMap[loc.type] || { fill: '#6366f1', stroke: '#4f46e5' };
+
+                    const marker = L.circleMarker([loc.lat, loc.lng], {
+                        radius: loc.type === 'Major' ? 10 : (loc.type === 'Serious' ? 8 : 7),
+                        fillColor: c.fill,
+                        color: c.stroke,
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.82
+                    });
+
+                    const date = loc.date ? new Date(loc.date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown';
+
+                    marker.bindPopup(`
+                        <span class="map-popup-type ${loc.type}">${loc.type}</span>
+                        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${loc.violation || 'Violation'}</div>
+                        <div style="color:#64748b;font-size:12px;">
+                            <i class="fas fa-user" style="width:14px;"></i> ${loc.student_name || 'Unknown'}
+                        </div>
+                        <div style="color:#64748b;font-size:12px;">
+                            <i class="fas fa-layer-group" style="width:14px;"></i> Grade ${loc.grade || '-'} - ${loc.section || '-'}
+                        </div>
+                        <div style="color:#64748b;font-size:12px;">
+                            <i class="fas fa-clock" style="width:14px;"></i> ${date}
+                        </div>
+                        <div style="color:#64748b;font-size:12px;">
+                            <i class="fas fa-info-circle" style="width:14px;"></i> ${loc.status || 'Pending'}
+                        </div>
+                    `, { maxWidth: 260 });
+
+                    marker.addTo(mapMarkersLayer);
+                    bounds.push([loc.lat, loc.lng]);
+                });
+
+                if (bounds.length > 1) {
+                    violationMapInstance.fitBounds(bounds, { padding: [40, 40] });
+                }
+            })
+            .catch(err => {
+                document.getElementById('mapSkeleton').style.display = 'none';
+                document.getElementById('mapContainer').style.display = 'block';
+                document.getElementById('mapViolationCount').textContent = 'Error';
+                document.getElementById('mapNoDataMsg').style.display = 'inline';
+                document.getElementById('mapNoDataMsg').textContent = 'Could not load location data.';
+                console.error('Map load error:', err);
+            });
+    }
+
+    function refreshViolationMap() {
+        const icon = document.getElementById('mapRefreshIcon');
+        if (icon) { icon.style.animation = 'spin 0.6s linear infinite'; }
+        if (violationMapInstance) {
+            mapMarkersLayer.clearLayers();
+        }
+        initViolationMap();
+        setTimeout(() => { if (icon) icon.style.animation = ''; }, 1000);
+    }
+
+    // Init map when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('violationMap')) {
+            initViolationMap();
+        }
+    });
+    </script>
+
     <!-- Load Dashboard Script -->
     <script src="js/dashboard.js"></script>
 
-    <?php include 'footer.php'; ?>
+    <?php include 'footer.php'; ?>

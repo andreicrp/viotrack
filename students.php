@@ -329,7 +329,7 @@ function exportStudents() {
     });
     
     if (exportCount === 0) {
-        alert('No students to export.');
+        toastWarning('No students to export.');
         return;
     }
     
@@ -346,7 +346,7 @@ function exportStudents() {
     link.click();
     document.body.removeChild(link);
     
-    alert(`Successfully exported ${exportCount} student(s)!`);
+    toastSuccess(`Successfully exported ${exportCount} student(s)!`);
 }
 
 // View Student - Opens the view modal
@@ -366,14 +366,14 @@ function viewStudent(button) {
         // Verify db_id exists
         if (!studentData.db_id) {
             console.error('WARNING: db_id is missing from student data!');
-            alert('Error: Student ID not properly loaded. Please refresh the page.');
+            toastError('Error: Student ID not properly loaded. Please refresh the page.');
             return;
         }
         
         openStudentModal(studentData);
     } catch (error) {
         console.error('Error in viewStudent:', error);
-        alert('Error loading student data: ' + error.message);
+        toastError('Error loading student data: ' + error.message);
     }
 }
 
@@ -384,7 +384,7 @@ function printIdCard(button) {
         const studentData = JSON.parse(row.dataset.student);
         
         if (!studentData.db_id) {
-            alert('Error: Student ID not found');
+            toastError('Error: Student ID not found');
             return;
         }
         
@@ -392,7 +392,7 @@ function printIdCard(button) {
         window.open(`print-student-id.php?id=${studentData.db_id}`, '_blank', 'width=800,height=900');
     } catch (error) {
         console.error('Error in printIdCard:', error);
-        alert('Error printing ID card: ' + error.message);
+        toastError('Error printing ID card: ' + error.message);
     }
 }
 
@@ -404,8 +404,14 @@ function editStudent(button) {
 }
 
 // Remove Student
-function removeStudent(button) {
-    if (confirm('Are you sure you want to remove this student?')) {
+async function removeStudent(button) {
+    const confirmed = await confirmAction(
+        'Remove Student',
+        'Are you sure you want to remove this student? This action cannot be undone.',
+        'Remove',
+        'danger'
+    );
+    if (confirmed) {
         const row = button.closest('tr');
         const dbId = row.dataset.dbId;
         
@@ -422,15 +428,15 @@ function removeStudent(button) {
             if (data.success) {
                 row.remove();
                 updateShowingText();
-                alert('Student removed successfully.');
+                toastSuccess('Student removed successfully.');
                 location.reload(); // Refresh to update counts
             } else {
-                alert('Error removing student: ' + data.message);
+                toastError('Error removing student: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error removing student.');
+            toastError('Error removing student.');
         });
     }
 }
@@ -483,12 +489,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Delete Selected - Uses single delete-student.php
-    deleteSelectedBtn.addEventListener('click', function() {
+    deleteSelectedBtn.addEventListener('click', async function() {
         const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
         const count = checkedBoxes.length;
         const ids = Array.from(checkedBoxes).map(cb => cb.value);
         
-        if (confirm(`Are you sure you want to delete ${count} selected student(s)?`)) {
+        const confirmed = await confirmAction(
+            `Delete ${count} Student(s)`,
+            `Are you sure you want to delete ${count} selected student(s)? This action cannot be undone.`,
+            'Delete',
+            'danger'
+        );
+        if (confirmed) {
             // Send AJAX request to delete multiple students
             fetch('php/delete-student.php', {
                 method: 'POST',
@@ -507,15 +519,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     selectAllCheckbox.indeterminate = false;
                     updateDeleteButton();
                     updateShowingText();
-                    alert(`Successfully deleted ${count} student(s).`);
+                    toastSuccess(`Successfully deleted ${count} student(s).`);
                     location.reload(); // Refresh to update counts
                 } else {
-                    alert('Error deleting students: ' + data.message);
+                    toastError('Error deleting students: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error deleting students.');
+                toastError('Error deleting students.');
             });
         }
     });

@@ -109,6 +109,9 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <!-- Design System -->
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/header.css">
@@ -124,6 +127,8 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
         /* Inline critical overrides */
         .main-content { z-index: 1; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/viotrack-ui.js" defer></script>
 </head>
 <body>
     <header class="main-header" id="mainHeader">
@@ -146,6 +151,12 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
         </div>
         
         <div class="header-right">
+            <!-- Theme Toggle -->
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+                <i class="fas fa-sun icon-sun"></i>
+                <i class="fas fa-moon icon-moon"></i>
+            </button>
+
             <!-- Notification Bell -->
             <div class="notification-container" id="notificationContainer">
                 <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
@@ -274,4 +285,28 @@ $avatar_url_48 = $profile_image ? $profile_image : ($user_avatar . '48');
                 })
                 .catch(() => {});
         })();
+    </script>
+
+    <!-- Theme Toggle Script -->
+    <script>
+    (function() {
+        const THEME_KEY = 'viotrack-theme';
+        const btn = document.getElementById('themeToggle');
+        
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem(THEME_KEY, theme);
+        }
+        
+        // Apply stored theme immediately to prevent flash
+        const stored = localStorage.getItem(THEME_KEY) || 'light';
+        applyTheme(stored);
+        
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme') || 'light';
+                applyTheme(current === 'dark' ? 'light' : 'dark');
+            });
+        }
+    })();
     </script>
